@@ -1,5 +1,5 @@
-require_relative './lib/openai-scraper.rb'
-require_relative './config.rb'
+require_relative './/lib/openai-scraper.rb'
+require_relative '../config.rb'
 
 filename = './hgwarchitecture.html'
 l = BlackStack::LocalLogger.new('parse.log')

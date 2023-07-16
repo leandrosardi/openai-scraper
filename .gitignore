@@ -1,2 +1,5 @@
 # ignore config.rb file with secret infromation
 config.rb
+
+# ignore log files
+*.log

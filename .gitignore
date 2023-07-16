@@ -1,0 +1,2 @@
+# ignore config.rb file with secret infromation
+config.rb

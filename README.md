@@ -1,5 +1,7 @@
 ![Gem version](https://img.shields.io/gem/v/openai-scraper) ![Gem downloads](https://img.shields.io/gem/dt/openai-scraper)
 
+**This project is just starting... Follow me to keep updated!**
+
 # OpenAI Scraper
 
 OpenAI Chatbot, With the Ability to Take Information from the Web.

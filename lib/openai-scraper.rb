@@ -1,11 +1,25 @@
 require 'nokogiri'
+require 'mechanize'
 require 'simple_cloud_logging'
 require "openai"
 require 'colorize'
 
+# require selenium
+require 'selenium-webdriver'
+
+def get_current_weather(location:, unit: "fahrenheit")
+    # use a weather api to fetch weather
+    return 0
+end
+
+def wl(url)
+    BlackStack::OpenAIScraper.wl(url)
+end
+
 module BlackStack
     module OpenAIScraper
         @@client = nil
+        @@browser = nil
 
         # hints to show in the terminal
         HINT1 = "HINT: The text below is a macr-generated prompt.".yellow
@@ -17,9 +31,13 @@ module BlackStack
         PROMPT = 'openai-scraper'
 
         def self.init
-            openai_apikey = OPENAI_APIKEY
-            @@client = OpenAI::Client.new(access_token: openai_apikey)
+            @@client = OpenAI::Client.new(access_token: OPENAI_APIKEY)
+            @@browser = Selenium::WebDriver.for :chrome
         end            
+
+        def self.finalize
+            @@browser.quit
+        end
 
         # help shown in the console
         def self.help
@@ -36,40 +54,79 @@ List of Commands:\n
                 parameters: {
                     model: "gpt-3.5-turbo", # Required.
                     messages: [{ role: "user", content: s}], # Required.
-                    temperature: 0.7,
+                    functions: [
+                        {
+                            name: "wl",
+                            description: "Extract the links from a web page",
+                            parameters: {
+                                type: :object,
+                                properties: {
+                                    url: {
+                                        type: "string",
+                                        description: "The url of the web page"    
+                                    },
+                                },
+                                required: ['url'],
+                            },
+                        },
+                        {
+                            name: "get_current_weather",
+                            description: "Get the current weather in a given location",
+                            parameters: {
+                                type: :object,
+                                properties: {
+                                    location: {
+                                        type: :string,
+                                        description: "The city and state, e.g. San Francisco, CA",
+                                    },
+                                    unit: {
+                                        type: "string",
+                                        enum: %w[celsius fahrenheit],
+                                    },
+                                },
+                                required: ["location"],
+                            },
+                        },
+                    ],
                 })
             raise response.dig("error", "message") if response.dig("error", "message")
+binding.pry
             return response.dig("choices", 0, "message", "content")         
         end
 
         # doanload the web page, and extract all links.
         # reutrn an openai prompt sharing all links in a json structure for further reference.
-        def self.wl(url)
-            # build the filename for the webpage
-            filename = "/tmp/openai-scraper-#{Time.now.to_i}.html"
-
-            # doanload the web page using Ruby libraries instead of call to bash commands
-            # `wget -O #{filename} #{url}`
-            uri = URI.parse(url)
-            Net::HTTP.start(uri.host, uri.port) do |http|
-                resp = http.get(uri.path)
-                open(filename, "wb") do |file|
-                    file.write(resp.body)
-                end
-            end
+        #
+        # example: \wl https://leadhype.com/
+        # example: What is the contact page in this list of links \wl https://leadhype.com/
+        # example: Give me all the links in this URL: https://leadhype.com/
+        #
+        def wl(url)
+            # visit the url
+            @@browser.navigate.to url
             
-            # parse the html file
-            doc = Nokogiri::HTML(open(filename))
+            # wait up to 30 seconds for the page to load
+            #wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+            #wait.until { @@browser.execute_script("return document.readyState") == "complete" }
 
-            # extract all the links
+            # wait up to 30 seconds for all ajax calls have been executed
+            #wait = Selenium::WebDriver::Wait.new(:timeout => 30)
+            #wait.until { @@browser.execute_script("return jQuery.active") == 0 }
+
+            # get all the links
+            links = @@browser.find_elements(:tag_name, 'a')
+
+            # add the links to a json structure
             h = []
-            doc.css('a').each do |link|
-                txt = link.content.to_s.strip
+            links.each do |link|
+                txt = link.text.to_s.strip
                 h << { 'href' => link['href'], 'text' => txt }
             end
-binding.pry
+
             # return the prompt
-            "I will share a json structure with with links. Please remember them for further reference:\n#{h.to_json}"
+            #"I will share a json structure with with links. Please remember them for further reference:\n#{h.join("\n").to_json}"
+            #"I have the links in a webpage. Which one of these links is the link to the \"contact us\" page of the company? \n #{h.join("\n")}"
+            h
         end # def wl
 
     end # module OpenAIScraper

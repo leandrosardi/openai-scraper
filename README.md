@@ -26,11 +26,15 @@ BlackStack::OpenAIScraper.set({
 BlackStack::OpenAIScraper.init
 
 # write a promopt
-prompt = "can you craft a no more than 5-word description of what is the main service offered by this company, in order to complete this sentence \"I noticed that your company\". Please don't incude that sentence in your answer, and please don't add any final-dot at the end of your answer: \\wt https://connectionsphere.com/"
-puts prompt.blue
+prompt = "can you craft a no more than 5-word description of what 
+is the main service offered by this company, in order to complete 
+this sentence \"I noticed that your company\". Please don't incude 
+that sentence in your answer, and please don't add any final-dot 
+at the end of your answer: \\wt https://connectionsphere.com/"
 
 # get the response
 puts BlackStack::OpenAIScraper.response(prompt).green
+# => Leads Generation Service
 ```
 
 ## Further Work

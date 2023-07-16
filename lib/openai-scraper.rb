@@ -7,6 +7,9 @@ module BlackStack
     module OpenAIScraper
         @@client = nil
 
+        # hints to show in the terminal
+        HINT1 = "HINT: The text below is a macr-generated prompt.".yellow
+
         # name of the module
         NAME = 'OpenAI Scraper'
 
@@ -64,7 +67,7 @@ List of Commands:\n
                 txt = link.content.to_s.strip
                 h << { 'href' => link['href'], 'text' => txt }
             end
-
+binding.pry
             # return the prompt
             "I will share a json structure with with links. Please remember them for further reference:\n#{h.to_json}"
         end # def wl

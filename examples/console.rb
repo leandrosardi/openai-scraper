@@ -2,7 +2,7 @@ require_relative '../lib/openai-scraper.rb'
 require_relative '../config.rb'
 
 filename = './hgwarchitecture.html'
-l = BlackStack::LocalLogger.new('parse.log')
+l = BlackStack::LocalLogger.new('console.log')
 
 l.log BlackStack::OpenAIScraper::NAME.green
 
@@ -27,6 +27,7 @@ while true
             # get the first parameter after \wl
             url = s.split(' ')[1]
             prompt = BlackStack::OpenAIScraper.wl(url)
+            puts BlackStack::OpenAIScraper::HINT1
             puts prompt.blue
         # \wt <url>: download the web-page and pass the text content to the model for further reference.\n 
         elsif s.start_with?('\wt')

@@ -1,4 +1,4 @@
-require_relative './/lib/openai-scraper.rb'
+require_relative '../lib/openai-scraper.rb'
 require_relative '../config.rb'
 
 filename = './hgwarchitecture.html'

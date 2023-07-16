@@ -4,7 +4,7 @@ require 'openai-scraper'
 
 # setup the scraper
 BlackStack::OpenAIScraper.set({
-    :openai_apikey => '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',
+    :openai_apikey => '<your openai api key here>',
 })
 
 # initialize the scraper: OpenAI and Chrome browser are created.

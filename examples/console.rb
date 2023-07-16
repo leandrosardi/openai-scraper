@@ -30,7 +30,7 @@ while true
             s.split(' ').each { |x|
                 if x == '\wl'
                     url = s.split(' ')[i+1]
-                    prompt.gsub!(/\\wl #{url}/, BlackStack::OpenAIScraper.wl(url))
+                    prompt.gsub!(/\\wl #{url}/, BlackStack::OpenAIScraper.wl(url).to_s)
                 end
                 i += 1
             }
@@ -42,7 +42,7 @@ while true
         else 
             prompt = s
         end
-
+binding.pry
         # standard openai prompt
         puts BlackStack::OpenAIScraper.response(prompt).to_s.green
 

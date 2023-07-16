@@ -7,14 +7,16 @@ require 'colorize'
 # require selenium
 require 'selenium-webdriver'
 
+=begin
 def get_current_weather(location:, unit: "fahrenheit")
     # use a weather api to fetch weather
-    return 0
+    { "temperature": 22, "unit": "celsius", "description": "Sunny" }
 end
 
 def wl(url)
     BlackStack::OpenAIScraper.wl(url)
 end
+=end
 
 module BlackStack
     module OpenAIScraper
@@ -53,7 +55,13 @@ List of Commands:\n
             response = @@client.chat(
                 parameters: {
                     model: "gpt-3.5-turbo", # Required.
-                    messages: [{ role: "user", content: s}], # Required.
+                    messages: [
+                        { role: "user", content: s},
+                        #{ role: "assistant", content: nil, function_call: {name: "get_current_weather", arguments: { location: "Boston, MA"}}},
+                        #{ role: "function", name: "get_current_weather", content: { temperature: "22", unit: "celsius", description: "Sunny"}},
+
+                    ], # Required.
+=begin
                     functions: [
                         {
                             name: "wl",
@@ -88,9 +96,9 @@ List of Commands:\n
                             },
                         },
                     ],
+=end
                 })
             raise response.dig("error", "message") if response.dig("error", "message")
-binding.pry
             return response.dig("choices", 0, "message", "content")         
         end
 
@@ -101,7 +109,7 @@ binding.pry
         # example: What is the contact page in this list of links \wl https://leadhype.com/
         # example: Give me all the links in this URL: https://leadhype.com/
         #
-        def wl(url)
+        def self.wl(url)
             # visit the url
             @@browser.navigate.to url
             

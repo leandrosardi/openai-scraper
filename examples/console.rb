@@ -11,7 +11,7 @@ l.logf "done".green
 
 # launch the console
 l.log "Launching console:"
-BlackStack::OpenAIScraper.console
+BlackStack::OpenAIScraper.console(l)
 
 # finish
 exit(0)

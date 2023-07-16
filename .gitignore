@@ -3,3 +3,6 @@ config.rb
 
 # ignore log files
 *.log
+
+# ignore json files
+*.json

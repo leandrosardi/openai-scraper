@@ -22,6 +22,7 @@ end
 module BlackStack
     module OpenAIScraper
         @@openai_apikey = nil
+        @@model = nil
         @@client = nil
         @@browser = nil
         @@history = []
@@ -37,17 +38,19 @@ module BlackStack
 
         def self.set(h)
             @@openai_apikey = h[:openai_apikey] if h[:openai_apikey]
+            @@model = h[:model] if h[:model]
         end
 
         def self.init
             @@client = OpenAI::Client.new(access_token: @@openai_apikey)
-            @@browser = Selenium::WebDriver.for :chrome
+            ## setup a mechanize client
+            @@browser = Mechanize.new
             # load history array from the file ./history.json, only if the file exists
             @@history = JSON.parse(File.read('./history.json')) if File.exist?('./history.json')
         end
 
         def self.finalize
-            @@browser.quit
+            #@@browser.quit
             # overrite the file ./history.json with the current history array
             File.write('./history.json', @@history.to_json)
         end
@@ -92,7 +95,7 @@ List of Commands:\n
 
             response = @@client.chat(
                 parameters: {
-                    model: "gpt-3.5-turbo", # Required.
+                    model: @@model, # Required.
                     #max_tokens: 6000,
                     temperature: 0.5,
                     messages: [
@@ -138,15 +141,48 @@ List of Commands:\n
                     ],
 =end
                 })
+#binding.pry
             raise response.dig("error", "message") if response.dig("error", "message")
             return response.dig("choices", 0, "message", "content")         
+        end
+
+        # get all links of the webiste, at a certainly deep level
+        def self.get_links(url, deep = 1, l=nil)
+            l = BlackStack::DummyLogger.new(nil) if l.nil?
+            ret = []
+            return ret if deep<=0
+            # go to the URL
+            l.logs "level #{deep} - get_links: #{url}... "
+                page = @@browser.get(url)
+                # get all links
+                links = page.search('a')
+                # add each link to the array
+                links.each do |link|
+                    txt = link.text.to_s.strip
+                    ret << { 'href' => link['href'], 'text' => txt }
+                end
+                # make ret an array of unique hashes
+                ret.uniq!
+                # remove links that are not belonging the same domain
+                ret.reject! { |h| h['href'] !~ /#{URI.parse(url).host}/ }
+                # remove links that are not belonging the protocols http or https
+                ret.reject! { |h| h['href'] !~ /^https?:\/\// }
+            l.logf 'done'.green
+
+            # get the links inside each link
+            ret.each do |link|
+                ret += get_links(link['href'], deep-1, l)
+            end
+
+            # return
+            ret
         end
 
         # download the web page, and extract all links.
         #
         def self.wl(url)
             # visit the url
-            @@browser.navigate.to url
+            page = @@browser.get(url)
             
             # wait up to 30 seconds for the page to load
             #wait = Selenium::WebDriver::Wait.new(:timeout => 30)
@@ -157,7 +193,7 @@ List of Commands:\n
             #wait.until { @@browser.execute_script("return jQuery.active") == 0 }
 
             # get all the links
-            links = @@browser.find_elements(:tag_name, 'a')
+            links = page.search('a')
 
             # add the links to a json structure
             h = []
@@ -176,7 +212,7 @@ List of Commands:\n
         #
         def self.wt(url)
             # visit the url
-            @@browser.navigate.to url
+            page = @@browser.get(url)
             
             # wait up to 30 seconds for the page to load
             #wait = Selenium::WebDriver::Wait.new(:timeout => 30)
@@ -186,8 +222,8 @@ List of Commands:\n
             #wait = Selenium::WebDriver::Wait.new(:timeout => 30)
             #wait.until { @@browser.execute_script("return jQuery.active") == 0 }
 
-            # return the text of the webpage
-            @@browser.find_element(:tag_name, 'body').text
+            # return the text of the body
+            page.search('body').text
         end # def wt
 
         # show the promt and wait for the user input

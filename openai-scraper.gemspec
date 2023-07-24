@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
     s.name        = 'openai-scraper'
-    s.version     = '1.3'
+    s.version     = '1.4'
     s.date        = '2023-07-24'
     s.summary     = "Ruby library for automation operation on the GMass Deliverability Test and Spam Checker."
     s.description = "Find documentation here: https://github.com/leandrosardi/openai-scraper"
@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
     s.files       = [
       'lib/openai-scraper.rb',
     ]
-    s.homepage    = 'https://rubygems.org/gems/openai-scraper'
+    s.homepage    = 'https://github.com/leandrosardi/openai-scraper'
     s.license     = 'MIT'
     s.add_runtime_dependency 'nokogiri', '~> 1.13.10', '>= 1.13.10'
     s.add_runtime_dependency 'mechanize', '~> 2.8.5', '>= 2.8.5'

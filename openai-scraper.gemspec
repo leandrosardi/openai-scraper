@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
     s.name        = 'openai-scraper'
-    s.version     = '1.4'
-    s.date        = '2023-07-24'
+    s.version     = '1.5'
+    s.date        = '2023-07-25'
     s.summary     = "Ruby library for automation operation on the GMass Deliverability Test and Spam Checker."
     s.description = "Find documentation here: https://github.com/leandrosardi/openai-scraper"
     s.authors     = ["Leandro Daniel Sardi"]

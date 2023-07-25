@@ -5,9 +5,6 @@ require "openai"
 require 'colorize'
 require "io/console"
 
-# require selenium
-require 'selenium-webdriver'
-
 =begin
 def get_current_weather(location:, unit: "fahrenheit")
     # use a weather api to fetch weather
@@ -213,7 +210,7 @@ List of Commands:\n
         def self.wt(url)
             # visit the url
             page = @@browser.get(url)
-            
+
             # wait up to 30 seconds for the page to load
             #wait = Selenium::WebDriver::Wait.new(:timeout => 30)
             #wait.until { @@browser.execute_script("return document.readyState") == "complete" }
